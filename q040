@@ -1,0 +1,97 @@
+class Calculator {
+private:
+	string expression;
+public:
+	Calculator(string expression) {
+		this->expression = expression;
+	}
+	string& GetExpression() {
+		return expression;
+	}
+	double GetResult() {
+		Stack<double> stack_digital;
+		Stack<char> stack_sign;
+		int i = 0; double temp = 0.0;
+		while (i < expression.size()) {
+			if (expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
+				stack_sign.push(expression[i++]);
+			}
+			else {
+				while (expression[i] != '+' && expression[i] != '-' && expression[i] != '*' && expression[i] != '/'&& i < expression.size()) {
+					if (expression[i] != ' ') {
+						temp = temp * 10 + (expression[i++] - '0');
+					}
+					else {
+						i++;
+					}
+				}
+				stack_digital.push(temp);
+				temp = 0.0;
+			}
+		}
+		Stack<double> stack_digital_temp;
+		Stack<char> stack_sign_temp;
+		while (stack_sign.empty()) {
+			if (stack_sign.Head() == '+') {
+				stack_sign_temp.push(stack_sign.Head());
+				stack_digital_temp.push(stack_digital.Head());
+				stack_digital.pop();
+				stack_sign.pop();
+			}
+			if (stack_sign.Head() == '-') {
+				stack_sign_temp.push(stack_sign.Head());
+				stack_digital_temp.push(stack_digital.Head());
+				stack_digital.pop();
+				stack_sign.pop();
+			}
+			if (stack_sign.Head() == '*') {
+				while ((stack_sign.Head() != '+' && stack_sign.Head() != '-' && stack_sign.Head() != '/')&& stack_sign.empty()) {
+					double first = stack_digital.Head();
+					stack_digital.pop();
+					double second = stack_digital.Head();
+					stack_digital.pop();
+					stack_digital.push(first * second);
+					stack_sign.pop();
+				}
+			}
+			if (stack_sign.Head() == '/') {
+				while ((stack_sign.Head() != '+' && stack_sign.Head() != '-' && stack_sign.Head() != '*') && stack_sign.empty()) {
+					double first = stack_digital.Head();
+					stack_digital.pop();
+					double second = stack_digital.Head();
+					stack_digital.pop();
+					stack_digital.push(second / first);
+					stack_sign.pop();
+				}
+			}
+		}		
+		if (stack_digital.empty()) {
+			stack_digital_temp.push(stack_digital.Head());
+			stack_digital.pop();
+		}
+		while (stack_sign_temp.empty()) {
+			switch (stack_sign_temp.Head()) {
+				case('+'): {
+					double first = stack_digital_temp.Head();
+					stack_digital_temp.pop();
+					double second = stack_digital_temp.Head();
+					stack_digital_temp.pop();
+					stack_digital_temp.push(first + second);
+					stack_sign_temp.pop();
+					break;
+				}
+				case('-'): {
+					double first = stack_digital_temp.Head();
+					stack_digital_temp.pop();
+					double second = stack_digital_temp.Head();
+					stack_digital_temp.pop();
+					stack_digital_temp.push(first - second);
+					stack_sign_temp.pop();
+					break;
+				}
+			}
+		}
+		return stack_digital_temp.Head();
+		stack_digital_temp.pop();
+	}
+};
